@@ -15,12 +15,17 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static rs.systempro.igramemorije.R.id.glMreza;
+
+
 
 public class GameActivity extends AppCompatActivity {
 
@@ -31,11 +36,32 @@ public class GameActivity extends AppCompatActivity {
     int solved=0;
     ArrayList<Drawable> images;
     ArrayList<ImageButton> lista = new ArrayList<ImageButton>();
+    int time=0;
+    java.util.Timer ti = new java.util.Timer();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        final TextView tv = (TextView) findViewById(R.id.tvtime);
+
+        ti.schedule(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                time++;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        tv.setText(time+"s");
+                    }
+                });
+
+            }
+        },1000,1000);
+
 
         Intent myIntent = getIntent();
         h = myIntent.getIntExtra("height", 4);
@@ -112,8 +138,10 @@ public class GameActivity extends AppCompatActivity {
                                     }
                                     lista.clear();
                                     if(solved == h*w) {
-                                        Toast.makeText(GameActivity.this, "Reseno", Toast.LENGTH_SHORT);
-
+                                        ti.cancel();
+                                        Intent intent = new Intent(getApplicationContext() ,GameOver.class);
+                                        intent.putExtra("time",time+"s");
+                                        startActivity(intent);
                                         finish();
                                     }
 
